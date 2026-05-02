@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Diagnóstico de Marca | Ruta Emprendedora</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      background: #f4f4f4;
+      color: #222;
+      line-height: 1.45;
+    }
+    .wrap {
+      max-width: 980px;
+      margin: 0 auto;
+      padding: 18px;
+    }
+    header {
+      background: #fff;
+      border: 1px solid #ddd;
+      padding: 18px;
+      margin-bottom: 14px;
+    }
+    h1, h2, h3 { margin: 0 0 8px; }
+    h1 { font-size: 26px; }
+    h2 { font-size: 20px; }
+    h3 { font-size: 17px; }
+    p { margin: 0 0 10px; }
+    .note { color: #555; font-size: 14px; }
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+    }
+    .card {
+      background: #fff;
+      border: 1px solid #ddd;
+      padding: 16px;
+      margin-bottom: 14px;
+    }
+    label {
+      display: block;
+      font-weight: bold;
+      margin: 12px 0 6px;
+      font-size: 14px;
+    }
+    input, textarea, select {
+      width: 100%;
+      padding: 11px;
+      border: 1px solid #bbb;
+      border-radius: 6px;
+      font-size: 15px;
+      font-family: inherit;
+    }
+    textarea { min-height: 80px; resize: vertical; }
+    .checks {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 8px;
+      margin-top: 8px;
+    }
+    .check {
+      border: 1px solid #ddd;
+      background: #fafafa;
+      padding: 10px;
+      font-size: 14px;
+    }
+    .check input { width: auto; margin-right: 6px; }
+    .questions {
+      display: grid;
+      gap: 10px;
+    }
+    .question {
+      border: 1px solid #ddd;
+      padding: 12px;
+      background: #fafafa;
+    }
+    .question-title {
+      font-weight: bold;
+      margin-bottom: 5px;
+    }
+    .radios {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 8px;
+    }
+    .radios label {
+      margin: 0;
+      font-weight: normal;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      background: #fff;
+      border: 1px solid #ccc;
+      padding: 7px 9px;
+      border-radius: 20px;
+      cursor: pointer;
+    }
+    .radios input { width: auto; }
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin: 12px 0;
+    }
+    button {
+      border: 0;
+      background: #111;
+      color: #fff;
+      padding: 12px 16px;
+      border-radius: 6px;
+      font-weight: bold;
+      cursor: pointer;
+      font-size: 15px;
+    }
+    button.secondary { background: #444; }
+    button.light { background: #e9e9e9; color: #111; border: 1px solid #bbb; }
+    #resultado { display: none; }
+    .result-box {
+      background: #fff;
+      border: 2px solid #111;
+      padding: 18px;
+      margin-bottom: 14px;
+    }
+    .result-head {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 8px;
+      margin-bottom: 14px;
+    }
+    .metric {
+      border: 1px solid #ddd;
+      background: #f8f8f8;
+      padding: 10px;
+    }
+    .metric span { display: block; font-size: 12px; color: #555; }
+    .metric strong { display: block; margin-top: 4px; }
+    .diagnostico-copy {
+      font-size: 17px;
+      line-height: 1.55;
+      border-top: 1px solid #ddd;
+      padding-top: 14px;
+      margin-top: 14px;
+    }
+    .diagnostico-copy strong { color: #000; }
+    .internal {
+      background: #f7f7f7;
+      border: 1px solid #ddd;
+      padding: 14px;
+      white-space: pre-wrap;
+      font-family: Arial, Helvetica, sans-serif;
+      font-size: 14px;
+    }
+    @media (max-width: 760px) {
+      .wrap { padding: 10px; }
+      .grid { grid-template-columns: 1fr; gap: 0; }
+      .checks { grid-template-columns: 1fr; }
+      .result-head { grid-template-columns: 1fr 1fr; }
+      button { width: 100%; }
+      .actions { display: grid; }
+    }
+    @media print {
+      body { background: #fff; }
+      header, form, .actions.no-print, .note.no-print { display: none !important; }
+      .wrap { max-width: none; padding: 0; }
+      #resultado { display: block !important; }
+      .result-box { border: none; padding: 0; }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <h1>Diagnóstico de Marca</h1>
+      <p><strong>Herramienta interna para Laura / LÜMA Go.</strong></p>
+      <p class="note">Sirve para diagnosticar en pocos minutos qué está frenando una marca y encuadrar al cliente en la solución correcta de la Ruta Emprendedora. No es un formulario para el cliente; es una herramienta de decisión comercial.</p>
+    </header>
+
+    <form id="formulario" onsubmit="event.preventDefault(); generarEncuadre();">
+      <div class="grid">
+        <section class="card">
+          <h2>1. Datos mínimos</h2>
+          <label>Marca</label>
+          <input id="marca" placeholder="Nombre de la marca" />
+          <label>Responsable</label>
+          <input id="responsable" placeholder="Nombre del cliente" />
+          <label>WhatsApp</label>
+          <input id="whatsapp" placeholder="569XXXXXXXX" />
+          <label>Correo</label>
+          <input id="correo" type="email" placeholder="cliente@correo.com" />
+          <label>Rubro</label>
+          <input id="rubro" placeholder="Ej: pastelería, estética, ropa, servicios" />
+          <label>Canal principal</label>
+          <input id="canalPrincipal" placeholder="Instagram, WhatsApp, local, web, etc." />
+        </section>
+
+        <section class="card">
+          <h2>2. Contexto comercial</h2>
+          <label>¿Qué vende o qué ofrece?</label>
+          <textarea id="oferta" placeholder="Resume la oferta principal"></textarea>
+          <label>¿Qué quiere lograr el cliente?</label>
+          <textarea id="objetivo" placeholder="Ej: verse más profesional, ordenar redes, vender mejor, recibir más consultas"></textarea>
+          <label>Observación de Laura</label>
+          <textarea id="observacion" placeholder="Lo que Laura detecta durante la conversación"></textarea>
+          <label>Próxima acción sugerida</label>
+          <select id="proximaAccion">
+            <option>Enviar diagnóstico y agendar revisión</option>
+            <option>Enviar propuesta comercial</option>
+            <option>Enviar link de pago</option>
+            <option>Solicitar material de marca</option>
+            <option>Agendar llamada de cierre</option>
+          </select>
+        </section>
+      </div>
+
+      <section class="card">
+        <h2>3. Canales actuales</h2>
+        <div class="checks">
+          <label class="check"><input type="checkbox" name="canales" value="Instagram"> Instagram</label>
+          <label class="check"><input type="checkbox" name="canales" value="Facebook"> Facebook</label>
+          <label class="check"><input type="checkbox" name="canales" value="TikTok"> TikTok</label>
+          <label class="check"><input type="checkbox" name="canales" value="WhatsApp"> WhatsApp</label>
+          <label class="check"><input type="checkbox" name="canales" value="Google Business"> Google Business</label>
+          <label class="check"><input type="checkbox" name="canales" value="Web / landing"> Web / landing</label>
+          <label class="check"><input type="checkbox" name="canales" value="Link en bio"> Link en bio</label>
+          <label class="check"><input type="checkbox" name="canales" value="Catálogo digital"> Catálogo digital</label>
+        </div>
+      </section>
+
+      <section class="card">
+        <h2>4. Encuadre de dolencia</h2>
+        <p class="note">Responder con criterio interno. La pregunta no es “qué quiere el cliente”, sino qué solución necesita realmente.</p>
+        <div class="questions" id="preguntas"></div>
+      </section>
+
+      <section class="card">
+        <h2>5. Punto de inversión</h2>
+        <label>¿Qué nivel parece más viable comercialmente?</label>
+        <select id="inversion">
+          <option value="basico">Partir con algo básico</option>
+          <option value="profesional">Verse más profesional</option>
+          <option value="contenido">Contenido mensual</option>
+          <option value="completo">Gestión más completa</option>
+        </select>
+      </section>
+
+      <div class="actions">
+        <button type="submit">Generar encuadre comercial</button>
+        <button type="button" class="light" onclick="limpiar()">Limpiar</button>
+      </div>
+    </form>
+
+    <section id="resultado">
+      <div class="result-box" id="resultadoContenido"></div>
+      <div class="actions no-print">
+        <button onclick="window.print()">Imprimir / guardar PDF</button>
+        <button class="secondary" onclick="enviarWhatsAppCliente()">Enviar mensaje al cliente</button>
+        <button class="secondary" onclick="enviarCorreoCliente()">Enviar correo al cliente</button>
+        <button class="secondary" onclick="enviarCorreoInterno()">Enviar ficha interna</button>
+      </div>
+      <p class="note no-print">La ficha interna se envía como texto a atencion@lumago.cl. No genera PDF ni adjuntos.</p>
+    </section>
+  </div>
+
+<script>
+  const preguntas = [
+    { bloque: 'orden', titulo: 'Claridad', texto: '¿Una persona entiende en menos de 5 segundos qué vende o qué ofrece la marca?' },
+    { bloque: 'orden', titulo: 'Claridad', texto: '¿La marca comunica con claridad para quién es su producto o servicio?' },
+    { bloque: 'orden', titulo: 'Claridad', texto: '¿El perfil, biografía o canal principal explica qué debe hacer el cliente después: escribir, comprar, reservar, cotizar o agendar?' },
+    { bloque: 'presentacion', titulo: 'Imagen', texto: '¿La marca se ve profesional frente a otras opciones del mismo rubro?' },
+    { bloque: 'presentacion', titulo: 'Imagen', texto: '¿Sus colores, diseños, fotos o publicaciones se ven coherentes entre sí?' },
+    { bloque: 'presentacion', titulo: 'Imagen', texto: '¿La imagen actual transmite el valor real de lo que vende?' },
+    { bloque: 'activacion', titulo: 'Presencia', texto: '¿La marca publica o aparece con constancia cada semana?' },
+    { bloque: 'activacion', titulo: 'Presencia', texto: '¿Tiene temas definidos o una idea clara de qué comunicar durante el mes?' },
+    { bloque: 'activacion', titulo: 'Presencia', texto: '¿Su contenido combina venta, confianza y educación, o solo publica cosas sueltas?' },
+    { bloque: 'conversion', titulo: 'Conversión', texto: '¿La marca recibe consultas, mensajes o señales de interés actualmente?' },
+    { bloque: 'conversion', titulo: 'Conversión', texto: '¿Tiene respuestas claras preparadas para atender a quienes preguntan?' },
+    { bloque: 'conversion', titulo: 'Conversión', texto: '¿Hace seguimiento a las personas interesadas o deja que la conversación se enfríe?' }
+  ];
+
+  const soluciones = {
+    orden: {
+      dolencia: 'falta de claridad y orden en la comunicación',
+      solucion: 'Marca Clara',
+      etapa: 'Ordenar',
+      precio: 'desde $30.000 CLP',
+      lectura: 'La marca tiene una oferta con potencial, pero hoy no está explicando su valor con suficiente claridad. El problema principal no es publicar más, sino ordenar lo que la marca está diciendo para que el cliente entienda rápido qué vende, para quién es y por qué debería confiar.',
+      argumento: 'Por lo que revisamos, tu marca tiene algo importante que ofrecer, pero hoy necesita comunicarlo con más claridad. Si el cliente no entiende rápido qué vendes, para quién es y cuál es el siguiente paso, la oportunidad se enfría. Por eso recomendamos partir con Marca Clara.',
+      acciones: ['ordenar mensaje central', 'mejorar presentación del perfil', 'definir cliente ideal', 'construir propuesta de valor inicial']
+    },
+    presentacion: {
+      dolencia: 'imagen débil o presentación poco profesional',
+      solucion: 'Marca Presente',
+      etapa: 'Presentar',
+      precio: 'desde $60.000 CLP',
+      lectura: 'La marca ya tiene una base, pero su imagen todavía no está sosteniendo el valor de lo que vende. Puede estar perdiendo confianza antes de que el cliente pregunte, porque la primera impresión no comunica suficiente orden, profesionalismo o seguridad.',
+      argumento: 'Por lo que revisamos, tu marca ya tiene una base, pero necesita verse más clara, coherente y profesional. Si la imagen no acompaña el valor de lo que vendes, el cliente puede dudar antes de escribirte o comprar. Por eso recomendamos partir con Marca Presente.',
+      acciones: ['ordenar línea visual', 'mejorar coherencia gráfica', 'crear descripción comercial clara', 'definir plantillas base']
+    },
+    activacion: {
+      dolencia: 'falta de presencia constante y contenido planificado',
+      solucion: 'Marca Activa',
+      etapa: 'Activar',
+      precio: 'desde $120.000 CLP',
+      lectura: 'La marca puede tener una base aceptable, pero está perdiendo visibilidad porque no comunica con constancia. En digital, desaparecer también comunica. El problema no es solo diseñar publicaciones, sino sostener una presencia con intención.',
+      argumento: 'Por lo que revisamos, tu marca necesita mantenerse más presente. Si apareces solo de vez en cuando, el cliente se olvida o termina escuchando a otra opción. Por eso recomendamos partir con Marca Activa, para sostener una comunicación mensual con orden e intención.',
+      acciones: ['crear calendario mensual', 'definir temas por semana', 'diseñar piezas de contenido', 'redactar copies comerciales y de confianza']
+    },
+    conversion: {
+      dolencia: 'pérdida de oportunidades por falta de atención y seguimiento',
+      solucion: 'Marca 360',
+      etapa: 'Convertir',
+      precio: 'desde $240.000 CLP',
+      lectura: 'La marca ya puede estar generando interés, pero si la comunicación, la atención y el seguimiento no están conectados, muchas oportunidades se pierden. El punto crítico no es solo atraer personas, sino conducirlas mejor hacia una decisión.',
+      argumento: 'Por lo que revisamos, tu marca ya puede estar generando interés, pero necesita un flujo más claro para no perder oportunidades. No basta con que alguien pregunte; hay que saber cómo responder, guiar y hacer seguimiento. Por eso recomendamos partir con Marca 360.',
+      acciones: ['revisar flujo de atención', 'crear respuestas rápidas', 'mejorar llamados a la acción', 'ordenar seguimiento comercial']
+    }
+  };
+
+  let ultimo = null;
+
+  function initPreguntas() {
+    document.getElementById('preguntas').innerHTML = preguntas.map((p, i) => `
+      <div class="question">
+        <div class="question-title">${p.titulo}</div>
+        <div>${p.texto}</div>
+        <div class="radios">
+          <label><input type="radio" name="q${i}" value="0" checked> Bien</label>
+          <label><input type="radio" name="q${i}" value="1"> Regular</label>
+          <label><input type="radio" name="q${i}" value="2"> Débil</label>
+        </div>
+      </div>
+    `).join('');
+  }
+
+  function v(id) { return (document.getElementById(id)?.value || '').trim(); }
+  function canales() { return Array.from(document.querySelectorAll('input[name="canales"]:checked')).map(x => x.value); }
+
+  function obtenerScores() {
+    const s = { orden: 0, presentacion: 0, activacion: 0, conversion: 0 };
+    preguntas.forEach((p, i) => {
+      const r = document.querySelector(`input[name="q${i}"]:checked`);
+      s[p.bloque] += Number(r?.value || 0);
+    });
+    return s;
+  }
+
+  function decidir(scores) {
+    if (scores.orden >= 4) return 'orden';
+    if (scores.presentacion >= 4) return 'presentacion';
+    if (scores.activacion >= 4) return 'activacion';
+    if (scores.conversion >= 4) return 'conversion';
+    return Object.keys(scores).sort((a, b) => scores[b] - scores[a])[0];
+  }
+
+  function nivel(score) {
+    if (score <= 1) return 'fuerte';
+    if (score <= 3) return 'medio';
+    return 'crítico';
+  }
+
+  function fortaleza(scores) {
+    const menor = Object.keys(scores).sort((a,b) => scores[a] - scores[b])[0];
+    const textos = {
+      orden: 'La marca tiene una base de claridad que se puede aprovechar para avanzar más rápido.',
+      presentacion: 'La marca ya cuenta con algunos elementos visuales o de presentación que pueden ordenarse y elevarse.',
+      activacion: 'La marca ya muestra intención de estar presente, lo que permite construir una comunicación más constante.',
+      conversion: 'La marca tiene canales o señales comerciales que pueden convertirse en oportunidades mejor gestionadas.'
+    };
+    return textos[menor];
+  }
+
+  function hoy() { return new Date().toLocaleDateString('es-CL'); }
+
+  function generarEncuadre() {
+    const scores = obtenerScores();
+    const key = decidir(scores);
+    const sol = soluciones[key];
+    ultimo = { scores, key, sol };
+
+    const marca = v('marca') || 'Marca no indicada';
+    const responsable = v('responsable') || 'Responsable no indicado';
+    const rubro = v('rubro') || 'Rubro no indicado';
+
+    document.getElementById('resultadoContenido').innerHTML = `
+      <h2>Resultado interno del diagnóstico</h2>
+      <p class="note">Este resultado es para Laura. Sirve para decidir qué solución presentar, cómo argumentarla y qué información enviar a coordinación.</p>
+
+      <div class="result-head">
+        <div class="metric"><span>Marca</span><strong>${marca}</strong></div>
+        <div class="metric"><span>Responsable</span><strong>${responsable}</strong></div>
+        <div class="metric"><span>Rubro</span><strong>${rubro}</strong></div>
+        <div class="metric"><span>Fecha</span><strong>${hoy()}</strong></div>
+      </div>
+
+      <h3>Diagnóstico comercial</h3>
+      <div class="diagnostico-copy">
+        <p><strong>Dolencia principal detectada:</strong> ${sol.dolencia}.</p>
+        <p><strong>Lectura interna:</strong> ${sol.lectura}</p>
+        <p><strong>Solución recomendada:</strong> ${sol.solucion} — ${sol.precio}.</p>
+        <p><strong>Criterio de encuadre:</strong> la marca debe entrar por <strong>${sol.solucion}</strong> porque el punto más urgente está en <strong>${sol.dolencia}</strong>. Ofrecer una solución más avanzada antes de resolver este punto puede generar más ruido que resultados.</p>
+      </div>
+
+      <h3>Argumento poderoso para presentar al cliente</h3>
+      <div class="diagnostico-copy">
+        <p>“${sol.argumento}”</p>
+      </div>
+
+      <h3>Primeras acciones recomendadas</h3>
+      <ul>${sol.acciones.map(a => `<li>${a}</li>`).join('')}</ul>
+
+      <h3>Semáforo interno</h3>
+      <div class="result-head">
+        <div class="metric"><span>Claridad</span><strong>${nivel(scores.orden)}</strong></div>
+        <div class="metric"><span>Imagen</span><strong>${nivel(scores.presentacion)}</strong></div>
+        <div class="metric"><span>Presencia</span><strong>${nivel(scores.activacion)}</strong></div>
+        <div class="metric"><span>Conversión</span><strong>${nivel(scores.conversion)}</strong></div>
+      </div>
+
+      <h3>Ficha interna resumida</h3>
+      <div class="internal">${fichaInterna()}</div>
+    `;
+
+    document.getElementById('resultado').style.display = 'block';
+    document.getElementById('resultado').scrollIntoView({ behavior: 'smooth' });
+  }
+
+  function mensajeCliente() {
+    if (!ultimo) generarEncuadre();
+    const marca = v('marca') || 'tu marca';
+    const nombre = v('responsable') || '';
+    const sol = ultimo.sol;
+    return `Hola ${nombre}, revisamos el estado actual de ${marca} y encontramos algo importante:\n\nLa marca ya tiene una base con potencial. El punto que hoy puede activar mejor su crecimiento es trabajar ${sol.dolencia}.\n\nPor eso recomendamos iniciar con ${sol.solucion} (${sol.precio}), dentro de la Ruta Emprendedora de LÜMA Go.\n\nLa idea es trabajar primero lo que más puede ayudarte a comunicar mejor, verte más profesional y avanzar con más orden.\n\nLÜMA Go\nTe ayudamos a comunicar mejor.`;
+  }
+
+  function fichaInterna() {
+    if (!ultimo) return '';
+    const s = ultimo.scores;
+    const sol = ultimo.sol;
+    return `Nueva ficha de encuadre comercial — Ruta Emprendedora
+
+Marca: ${v('marca')}
+Responsable: ${v('responsable')}
+WhatsApp: ${v('whatsapp')}
+Correo: ${v('correo')}
+Rubro: ${v('rubro')}
+Canal principal: ${v('canalPrincipal')}
+Canales actuales: ${canales().join(', ')}
+
+Qué vende/ofrece:
+${v('oferta')}
+
+Objetivo del cliente:
+${v('objetivo')}
+
+Observación de Laura:
+${v('observacion')}
+
+Dolencia principal: ${sol.dolencia}
+Solución recomendada: ${sol.solucion} (${sol.precio})
+Etapa: ${sol.etapa}
+Punto de inversión: ${v('inversion')}
+Próxima acción: ${v('proximaAccion')}
+
+Puntajes:
+Claridad: ${s.orden}/6
+Imagen: ${s.presentacion}/6
+Presencia: ${s.activacion}/6
+Conversión: ${s.conversion}/6
+
+Lectura interna:
+${sol.lectura}
+
+Argumento comercial sugerido:
+${sol.argumento}
+
+Acciones recomendadas:
+- ${sol.acciones.join('\n- ')}`;
+  }
+
+  function enviarWhatsAppCliente() {
+    const numero = (v('whatsapp') || '').replace(/[^0-9]/g, '');
+    window.open(`https://wa.me/${numero}?text=${encodeURIComponent(mensajeCliente())}`, '_blank');
+  }
+
+  function enviarCorreoCliente() {
+    const asunto = encodeURIComponent(`Recomendación inicial para ${v('marca') || 'tu marca'}`);
+    const cuerpo = encodeURIComponent(mensajeCliente());
+    window.location.href = `mailto:${v('correo')}?subject=${asunto}&body=${cuerpo}`;
+  }
+
+  function enviarCorreoInterno() {
+    if (!ultimo) generarEncuadre();
+    const asunto = encodeURIComponent(`Nueva ficha de encuadre — ${v('marca') || 'Ruta Emprendedora'}`);
+    const cuerpo = encodeURIComponent(fichaInterna());
+    window.location.href = `mailto:atencion@lumago.cl?subject=${asunto}&body=${cuerpo}`;
+  }
+
+  function limpiar() {
+    document.getElementById('formulario').reset();
+    document.getElementById('resultado').style.display = 'none';
+    ultimo = null;
+  }
+
+  initPreguntas();
+</script>
+</body>
+</html>
